@@ -1,0 +1,37 @@
+/* ===== Atenea local: ajustes para la app sin servidor ===== */
+
+/* No hay cuentas: nunca se muestra el login ni la gestión de usuarios */
+body.modo-local .login-screen,
+body.modo-local #topbar-admin-btn,
+body.modo-local #sidebar-admin-btn { display: none !important; }
+
+/* Acciones del catálogo (nuevo producto, respaldo) */
+.local-cat-acciones { display: flex; gap: 8px; flex-wrap: wrap; margin: -4px 0 14px; }
+.local-btn-peligro { color: #b91c1c !important; }
+.local-con-boton { display: flex; gap: 8px; align-items: stretch; }
+.local-con-boton input { flex: 1; min-width: 0; }
+
+/* Panel inferior (archivo guardado / respaldo) */
+.local-sheet-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(8, 10, 13, 0.55);
+    display: flex; align-items: flex-end; justify-content: center;
+}
+.local-sheet-overlay.hidden { display: none; }
+.local-sheet {
+    width: 100%; max-width: 520px;
+    background: var(--surface); border-radius: 18px 18px 0 0;
+    padding: 20px 18px calc(22px + env(safe-area-inset-bottom));
+    border-top: 4px solid var(--amber);
+    animation: local-subir .22s ease-out;
+}
+@keyframes local-subir { from { transform: translateY(30px); opacity: .5; } }
+.local-sheet-titulo { font-weight: 700; font-size: 17px; }
+.local-sheet-sub { color: var(--text-muted); font-size: 13.5px; margin: 4px 0 16px; word-break: break-word; }
+.local-sheet-botones { display: flex; flex-direction: column; gap: 10px; }
+.local-sheet-botones .btn { width: 100%; justify-content: center; min-height: 46px; }
+@media (min-width: 700px) {
+    .local-sheet-overlay { align-items: center; }
+    .local-sheet { border-radius: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .local-sheet { animation: none; } }

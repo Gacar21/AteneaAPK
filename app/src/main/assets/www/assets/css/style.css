@@ -1,0 +1,1426 @@
+/* =========================================================
+   Atenea — Sistema visual
+   Paleta "Lubricación de Clase Mundial": fondo blanco, rojo
+   corporativo como acento primario, dorado del isotipo como
+   acento secundario.
+   ========================================================= */
+
+@import url('fonts.css');
+
+:root {
+    /* superficie */
+    --bg: #f7f7f8;
+    --surface: #ffffff;
+    --surface-2: #f2f3f5;
+    --border: #e2e4e8;
+    --border-soft: #ebecef;
+
+    /* texto */
+    --text: #1c1e22;
+    --text-muted: #6b7280;
+    --text-faint: #9aa0ab;
+
+    /* acentos (marca Lubricación de Clase Mundial) */
+    --amber: #e31d25;
+    --amber-soft: rgba(227, 29, 37, 0.10);
+    --teal: #c9930c;
+    --teal-soft: rgba(250, 190, 21, 0.16);
+    --danger: #c0392b;
+    --danger-soft: rgba(192, 57, 43, 0.12);
+    --success: #2f9e58;
+    --success-soft: rgba(47, 158, 88, 0.12);
+
+    /* color de texto sobre botones/insignias de acento (fondo rojo/dorado) */
+    --on-accent: #ffffff;
+
+    /* tipografia */
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow-lift: 0 8px 30px rgba(20, 20, 25, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    /* Evita el zoom por doble-toque / pellizco en moviles (junto con el
+       meta viewport en index.html) y elimina el "flash" gris al tocar. */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    /* Evita que iOS/Android agranden el texto automaticamente al rotar
+       la pantalla, lo que movería el layout sin que el usuario haga zoom. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+html {
+    /* Solo en <html>, que es el scroller raiz real: evita el scroll/rebote
+       horizontal sin crear un contenedor de scroll nuevo en <body>, lo que
+       rompería el position:sticky de la barra de acciones inferior. NO
+       agregar overflow-x ni una altura fija en <body>: eso convierte a
+       <body> en un segundo contenedor de scroll y la barra inferior queda
+       "sticky" dentro de ese contenedor en vez de pegada al fondo real de
+       la pantalla (por eso hacía falta scroll para verla). */
+    overflow-x: hidden;
+}
+
+body {
+    max-width: 100vw;
+}
+
+/* Toda imagen es fluida por defecto: evita que una imagen con ancho
+   intrinseco grande empuje el layout y genere scroll horizontal
+   (parte de la estabilidad estructural pedida en PC y movil). */
+img { max-width: 100%; height: auto; }
+
+body {
+    background-image:
+        radial-gradient(circle at 15% 0%, rgba(227, 29, 37, 0.05), transparent 40%),
+        radial-gradient(circle at 85% 100%, rgba(250, 190, 21, 0.08), transparent 45%);
+    background-attachment: fixed;
+}
+
+::selection { background: var(--amber); color: var(--on-accent); }
+
+a { color: inherit; }
+
+button { font-family: inherit; }
+
+/* ---------- Layout general ---------- */
+
+.app-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-width: 0;
+}
+
+/* La barra lateral es siempre un panel tipo "menu" flotante (drawer):
+   no reserva columna ni en PC ni en movil, y solo se ve mientras esta
+   abierta (clase .open), disparada por el boton "Menú" en PC o por los
+   botones de la barra inferior en movil (ver mobile-tabbar). */
+.sidebar {
+    background: var(--surface);
+    padding: 26px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 78%;
+    max-width: 300px;
+    height: 100dvh;
+    z-index: 50;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: var(--shadow-lift);
+}
+.sidebar.open { transform: translateX(0); }
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 6px;
+    position: relative;
+}
+
+.brand-logo {
+    width: 100%;
+    max-width: 190px;
+    height: auto;
+    display: block;
+}
+
+.brand-sub {
+    font-size: 10.5px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0 6px;
+    margin-top: -6px;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--text-faint);
+    padding: 0 10px;
+    margin: 10px 0 4px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 11px;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    user-select: none;
+}
+
+.nav-item:hover { background: var(--surface-2); color: var(--text); }
+
+.nav-item.active {
+    background: var(--amber-soft);
+    color: var(--amber);
+    border-color: rgba(227, 29, 37, 0.22);
+}
+
+.nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+/* ---------- Modulos "en desarrollo" (entregas parciales del proyecto) ---------- */
+.nav-item.nav-en-desarrollo { opacity: 0.6; flex-wrap: wrap; }
+.nav-item.nav-en-desarrollo:hover { opacity: 0.85; }
+.nav-dev-badge {
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+    background: var(--surface-2);
+    padding: 2px 7px;
+    border-radius: 100px;
+    flex-basis: 100%;
+    margin-left: 28px;
+    width: fit-content;
+}
+/* En la barra inferior movil no hay espacio para el texto de la insignia;
+   basta con dejar la pestaña atenuada (icono + etiqueta ya existentes). */
+.mobile-tab.nav-en-desarrollo .nav-dev-badge { display: none; }
+
+.btn-disabled-dev { opacity: 0.55; }
+
+.en-desarrollo-card { text-align: center; padding: 56px 24px; }
+.en-desarrollo-icono { font-size: 40px; margin-bottom: 14px; }
+
+.sidebar-foot {
+    margin-top: auto;
+    padding: 12px 10px;
+    border-top: 1px solid var(--border-soft);
+    font-size: 11px;
+    color: var(--text-faint);
+    line-height: 1.6;
+}
+
+.main {
+    padding: 34px 42px 60px;
+    max-width: 1180px;
+    width: 100%;
+    margin: 0 auto;
+    min-width: 0;
+}
+
+.view { display: none; animation: fadeIn 0.25s ease; }
+.view.active { display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 28px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.view-title {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
+}
+
+.view-desc {
+    color: var(--text-muted);
+    font-size: 13.5px;
+    max-width: 560px;
+}
+
+.eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* ---------- Tarjetas ---------- */
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+}
+
+.card + .card { margin-top: 18px; }
+
+.card-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 15px;
+    margin: 0 0 4px;
+}
+
+.card-sub {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+
+@media (max-width: 860px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+
+/* ---------- Formularios ---------- */
+
+.field { margin-bottom: 16px; }
+
+.field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.field input[type="text"],
+.field input[type="number"],
+.field input[type="email"],
+.field input[type="password"],
+.field select,
+.field textarea {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+    border-color: var(--amber);
+    background: #ffffff;
+}
+
+.field textarea { font-family: var(--font-body); resize: vertical; min-height: 60px; }
+
+.field-hint { font-size: 11px; color: var(--text-faint); margin-top: 5px; }
+
+.field-suffix-wrap { position: relative; }
+.field-suffix {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11.5px;
+    color: var(--text-faint);
+    pointer-events: none;
+}
+
+/* Selector de modo (pestañas) */
+.tab-select {
+    display: flex;
+    gap: 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin-bottom: 20px;
+}
+.tab-select button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 9px 10px;
+    border-radius: 5px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.tab-select button.active { background: var(--amber); color: var(--on-accent); }
+.tab-select button:not(.active):hover { color: var(--text); }
+
+/* ---------- Botones ---------- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.btn:active { transform: scale(0.98); }
+
+.btn-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.14);
+    transform: scale(0);
+    animation: rippleAnim 0.55s ease-out;
+    pointer-events: none;
+}
+@keyframes rippleAnim {
+    to { transform: scale(2.6); opacity: 0; }
+}
+
+.btn-primary { background: var(--amber); color: var(--on-accent); }
+.btn-primary:hover { background: #c81922; }
+
+.btn-ghost { background: transparent; color: var(--text-muted); border-color: var(--border); }
+.btn-ghost:hover { color: var(--text); border-color: var(--text-faint); }
+
+.btn-teal { background: var(--teal-soft); color: var(--teal); border-color: rgba(250,190,21,0.45); }
+.btn-teal:hover { background: rgba(250,190,21,0.28); }
+
+.btn-danger { background: transparent; color: var(--danger); border-color: rgba(192,57,43,0.3); }
+.btn-danger:hover { background: var(--danger-soft); }
+
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn svg { width: 15px; height: 15px; }
+
+/* ---------- Resultado destacado ---------- */
+
+.resultado-box {
+    background: linear-gradient(135deg, rgba(227,29,37,0.08), rgba(227,29,37,0.02));
+    border: 1px solid rgba(227,29,37,0.25);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 6px;
+}
+
+.resultado-label {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.resultado-valor {
+    font-family: var(--font-mono);
+    font-size: 34px;
+    font-weight: 600;
+    color: var(--amber);
+    line-height: 1;
+}
+
+.resultado-valor small { font-size: 15px; color: var(--text-muted); font-weight: 400; margin-left: 4px; }
+
+.resultado-meta {
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+}
+
+.resultado-meta div { text-align: right; }
+
+.resultado-meta .m-label { font-size: 10.5px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; }
+.resultado-meta .m-valor { font-family: var(--font-mono); font-size: 14px; color: var(--text); margin-top: 2px; }
+
+.badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 100px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+.badge-amber { background: var(--amber-soft); color: var(--amber); }
+.badge-teal { background: var(--teal-soft); color: var(--teal); }
+
+/* Insignia clicable (ej. "falta un dato -- calcular"): mismo look que
+   .badge pero como <button>, asi que se resetean los estilos nativos de
+   boton y se le da un borde para que se note que es interactiva. */
+.badge-btn {
+    border: 1px solid var(--amber);
+    background: var(--amber-soft);
+    color: var(--amber);
+    cursor: pointer;
+    font-family: inherit;
+    white-space: normal;
+    text-align: left;
+}
+.badge-btn:hover { background: var(--amber); color: var(--on-accent); }
+
+/* ---------- Catalogo de lubricantes ---------- */
+.producto-card { padding: 16px 18px; margin-bottom: 12px; }
+.producto-card .badge { margin-right: 6px; margin-top: 6px; display: inline-block; }
+.producto-card-info { flex: 1 1 auto; min-width: 0; }
+.producto-card-info .card-title { overflow-wrap: break-word; word-break: break-word; }
+
+/* Boton "Registrar" (estrella): tamaño fijo para que nunca compita por
+   espacio con el titulo/badges -- el contenedor .flex-between ya hace
+   wrap, asi que en tarjetas angostas cae a su propia linea en vez de
+   superponerse. */
+.reg-star {
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    min-height: 0;
+    padding: 0;
+    font-size: 17px;
+    line-height: 1;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.reg-star.reg-active { color: var(--amber); border-color: var(--amber); background: var(--amber-soft); }
+#cat-modal-reg-btn.reg-star { width: auto; height: auto; min-height: 38px; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 12px; }
+.producto-specs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px 16px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-soft);
+}
+.producto-specs .m-label { display: block; font-size: 10.5px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; }
+.producto-specs .m-valor { display: block; font-family: var(--font-mono); font-size: 13.5px; color: var(--text); margin-top: 2px; }
+@media (max-width: 640px) {
+    .producto-specs { grid-template-columns: repeat(2, 1fr); }
+}
+
+.producto-card { cursor: pointer; transition: border-color 0.15s; }
+.producto-card:hover { border-color: var(--teal); }
+
+/* ---------- Modal ficha de producto ---------- */
+.modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(8, 10, 13, 0.65);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 40px 16px; overflow-y: auto;
+}
+.modal-overlay.hidden { display: none; }
+.modal-box {
+    position: relative;
+    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius);
+    max-width: 620px; width: 100%; padding: 26px 24px; margin-top: 20px;
+}
+.modal-close {
+    position: absolute; top: 14px; right: 14px;
+    background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: 50%;
+    width: 32px; height: 32px; color: var(--text-faint); cursor: pointer; font-size: 14px;
+}
+.modal-close:hover { color: var(--text); }
+.modal-specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 20px; margin: 18px 0; padding: 16px 0; border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+.modal-specs .m-label { display: block; font-size: 10.5px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; }
+.modal-specs .m-valor { display: block; font-family: var(--font-mono); font-size: 14px; color: var(--text); margin-top: 2px; }
+.modal-caracteristicas { white-space: pre-line; font-size: 13.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 18px; }
+@media (max-width: 640px) {
+    .modal-specs { grid-template-columns: repeat(2, 1fr); }
+    .modal-box { padding: 20px 16px; }
+}
+
+/* ---------- Tablas ---------- */
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+
+table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+}
+
+table.data th {
+    background: var(--surface-2);
+    color: var(--text-muted);
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+}
+
+table.data td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-soft);
+    font-family: var(--font-mono);
+    white-space: nowrap;
+}
+
+table.data tbody tr:hover { background: rgba(0,0,0,0.025); }
+table.data tbody tr:last-child td { border-bottom: none; }
+
+.td-nombre { font-family: var(--font-body); white-space: normal; }
+
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-faint);
+}
+.empty-state svg { width: 40px; height: 40px; margin-bottom: 12px; opacity: 0.5; }
+.empty-state p { font-size: 13px; margin: 0; }
+
+/* ---------- Chips de historial / filtros ---------- */
+
+.filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.chip {
+    padding: 6px 13px;
+    border-radius: 100px;
+    font-size: 12px;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    cursor: pointer;
+}
+.chip.active { background: var(--amber); color: var(--on-accent); border-color: var(--amber); }
+
+/* ---------- Gráficos ---------- */
+
+.chart-wrap { background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 18px; }
+.chart-canvas-box { position: relative; height: 340px; }
+
+/* ---------- Dashboard / hero ---------- */
+
+.hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 34px 36px;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 30px;
+    align-items: center;
+    margin-bottom: 26px;
+    overflow: hidden;
+    position: relative;
+}
+
+.hero h1 {
+    font-family: var(--font-display);
+    font-size: 30px;
+    line-height: 1.15;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+}
+
+.hero p { color: var(--text-muted); font-size: 14px; max-width: 420px; margin: 0 0 20px; }
+
+.hero-curve { width: 100%; height: 210px; }
+
+.hero-curve path.curve-line {
+    fill: none;
+    stroke: var(--amber);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 900;
+    stroke-dashoffset: 900;
+    animation: draw 1.8s ease forwards 0.2s;
+}
+.hero-curve path.curve-line-2 {
+    fill: none;
+    stroke: var(--teal);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 900;
+    stroke-dashoffset: 900;
+    opacity: 0.75;
+    animation: draw 1.8s ease forwards 0.5s;
+}
+@keyframes draw { to { stroke-dashoffset: 0; } }
+
+.stat-row { display: flex; gap: 26px; margin-top: 4px; }
+.stat-row .stat-num { font-family: var(--font-mono); font-size: 21px; color: var(--amber); font-weight: 600; }
+.stat-row .stat-label { font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.05em; }
+
+@media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; }
+}
+
+/* ---------- Menu de botones (pantalla de inicio) ---------- */
+
+.hero-menu {
+    display: block;
+    text-align: center;
+    padding: 40px 36px 34px;
+}
+
+.hero-logo {
+    max-width: 260px;
+    width: 100%;
+    height: auto;
+    margin: 0 auto 18px;
+    display: block;
+}
+
+.hero-menu .eyebrow { text-align: center; }
+
+.hero-menu h1 {
+    font-family: var(--font-display);
+    font-size: 26px;
+    line-height: 1.2;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+}
+
+.hero-menu p {
+    color: var(--text-muted);
+    font-size: 14px;
+    max-width: 560px;
+    margin: 0 auto 26px;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    text-align: left;
+}
+
+.menu-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 18px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    transition: border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.menu-card:hover {
+    border-color: var(--amber);
+    box-shadow: 0 6px 18px rgba(227, 29, 37, 0.12);
+    transform: translateY(-2px);
+}
+
+.menu-card:active { transform: translateY(0) scale(0.98); }
+
+.menu-card-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--amber-soft);
+    color: var(--amber);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.menu-card-icon svg { width: 21px; height: 21px; }
+
+.menu-card-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--text);
+}
+
+.menu-card-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.hero-menu .stat-row {
+    justify-content: center;
+    margin-top: 30px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-soft);
+}
+
+@media (max-width: 860px) {
+    .menu-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+    .menu-grid { grid-template-columns: 1fr; }
+    .hero-menu { padding: 30px 18px 26px; }
+    .hero-logo { max-width: 210px; }
+}
+
+/* ---------- Toast ---------- */
+
+#toast-holder {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 999;
+}
+
+.toast {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 13px;
+    box-shadow: var(--shadow-lift);
+    min-width: 240px;
+    animation: slideIn 0.2s ease;
+}
+.toast.error { border-left-color: var(--danger); }
+.toast.success { border-left-color: var(--success); }
+
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ---------- Utilidades ---------- */
+
+.mt-0 { margin-top: 0; }
+.text-muted { color: var(--text-muted); }
+.text-faint { color: var(--text-faint); }
+.font-mono { font-family: var(--font-mono); }
+.flex-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.divider { height: 1px; background: var(--border-soft); margin: 20px 0; }
+.hidden { display: none !important; }
+
+.spinner {
+    width: 15px; height: 15px;
+    border: 2px solid rgba(0,0,0,0.15);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* =========================================================
+   TOPBAR única (PC + móvil), menú deslizante y navegación inferior
+   ========================================================= */
+
+/* Barra superior: en movil solo muestra logo + titulo (la navegacion
+   real esta en .mobile-tabbar, abajo). En PC ademas aparece el boton
+   "Menú" (.menu-toggle-btn) que abre el panel .sidebar como drawer;
+   no hay opciones de navegacion fijas a los lados en ningun tamaño. */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 14px;
+    height: 56px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+}
+.topbar-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 15.5px;
+    flex: 1;
+    text-align: center;
+}
+.topbar-mark { width: 84px; height: auto; flex-shrink: 0; }
+
+.menu-toggle-btn {
+    /* Oculto en movil: ahi la navegacion va solo por los botones de abajo. */
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+.menu-toggle-btn:hover { background: var(--surface); border-color: var(--amber); color: var(--amber); }
+.menu-toggle-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* Boton para volver al panel principal desde cualquier modulo, solo en PC
+   (en movil ya existe la pestaña "Panel" de la barra inferior para eso). */
+.topbar-back-btn {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.topbar-back-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+.topbar-back-btn:hover { background: var(--surface-2); color: var(--text); border-color: var(--text-faint); }
+
+@media (min-width: 861px) {
+    .menu-toggle-btn { display: flex; }
+    .topbar-back-btn:not(.hidden) { display: flex; }
+}
+
+.mobile-menu-close {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    padding: 6px;
+    display: flex;
+    margin-left: auto;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.mobile-menu-close svg { width: 22px; height: 22px; }
+
+.sidebar-scrim {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 49;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.sidebar-scrim.visible { display: block; opacity: 1; }
+
+.mobile-tabbar {
+    display: none;
+    position: sticky;
+    bottom: 0;
+    z-index: 40;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+    align-items: stretch;
+    justify-content: space-around;
+}
+.mobile-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex: 1;
+    padding: 6px 4px;
+    border-radius: 10px;
+    color: var(--text-faint);
+    font-size: 10.5px;
+    font-weight: 600;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.15s ease;
+}
+.mobile-tab svg { width: 21px; height: 21px; }
+.mobile-tab.active { color: var(--amber); }
+.mobile-tab:active { transform: scale(0.94); }
+
+/* =========================================================
+   MÓVIL — breakpoint principal (tablet / celular grande)
+   ========================================================= */
+
+@media (max-width: 860px) {
+    .mobile-tabbar { display: flex; }
+
+    .main { padding: 18px 16px 90px; }
+
+    .view-header { margin-bottom: 20px; }
+    .view-title { font-size: 21px; }
+
+    .hero { padding: 22px 20px; border-radius: 12px; }
+    .hero h1 { font-size: 22px; }
+    .hero-curve { display: none; }
+    .stat-row { gap: 16px; flex-wrap: wrap; }
+
+    .card { padding: 16px; border-radius: 12px; }
+
+    /* Botones e inputs con objetivo táctil de 44px+ */
+    .btn { padding: 12px 18px; font-size: 14px; min-height: 46px; }
+    .btn-sm { min-height: 38px; padding: 8px 12px; }
+    .field input, .field select, .field textarea { padding: 13px 14px; font-size: 16px; min-height: 48px; }
+    .field textarea { min-height: 80px; }
+    .tab-select button { padding: 12px 8px; font-size: 12px; }
+
+    /* Barra de accion principal, fija justo encima de la barra de navegacion inferior */
+    .action-bar-mobile {
+        position: sticky;
+        bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+        margin: 20px -16px 0;
+        padding: 10px 16px;
+        background: linear-gradient(0deg, var(--bg) 60%, rgba(18,22,28,0));
+        z-index: 5;
+    }
+    .action-bar-mobile .btn { flex: 1; box-shadow: 0 4px 16px rgba(0,0,0,0.35); }
+    .action-bar-mobile .btn-primary { order: 1; }
+    .action-bar-mobile .btn-ghost { order: 2; flex: 0 0 auto; }
+
+    /* Dentro del modal de producto, la barra NO debe quedar "sticky" al
+       fondo del viewport: el modal tiene su propio scroll dentro de
+       .modal-overlay, asi que el sticky pensado para pegarse encima de la
+       barra de navegacion inferior de la pagina termina flotando sobre
+       texto que todavia no se hizo scroll. Ahi se comporta como una fila
+       mas, en flujo normal. */
+    .modal-box .action-bar-mobile {
+        position: static;
+        margin: 20px 0 0;
+        padding: 0;
+        background: none;
+    }
+
+    /* Cuando la barra tiene 3+ botones con textos largos (ej. la ficha de
+       producto del catalogo), repartir el ancho entre "flex:1" y "flex:0 0
+       auto" puede dejarle muy poco espacio al boton flexible y su texto se
+       corta/amontona. Apilarlos a ancho completo evita ese problema y sigue
+       siendo comodo de tocar en movil. */
+    .action-bar-mobile.stack-mobile { flex-direction: column; }
+    .action-bar-mobile.stack-mobile .btn,
+    .action-bar-mobile.stack-mobile .btn-ghost { flex: 1 1 100%; order: initial; }
+
+    #toast-holder { left: 12px; right: 12px; bottom: 78px; }
+    .toast { min-width: 0; width: 100%; }
+}
+
+@media (max-width: 480px) {
+    .grid-3 { grid-template-columns: 1fr; }
+    .resultado-valor { font-size: 28px; }
+    .resultado-box { padding: 18px; }
+    .resultado-meta { gap: 14px; width: 100%; justify-content: space-between; }
+    .resultado-meta div { text-align: left; }
+    .chart-canvas-box { height: 260px; }
+    .view-desc { font-size: 12.5px; }
+}
+
+/* =========================================================
+   MÓVIL — tablas en modo tarjeta (evita el scroll horizontal)
+   ========================================================= */
+
+@media (max-width: 640px) {
+    table.data thead { display: none; }
+    .table-wrap { border: none; overflow: visible; }
+
+    table.data, table.data tbody, table.data tr, table.data td { display: block; width: 100%; }
+
+    table.data tr {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 12px;
+        padding: 6px 4px;
+    }
+
+    table.data td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        text-align: right;
+        white-space: normal;
+        border-bottom: 1px solid var(--border-soft);
+        padding: 10px 12px;
+    }
+    table.data td:last-child { border-bottom: none; }
+
+    table.data td::before {
+        content: attr(data-label);
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-faint);
+        text-align: left;
+        flex-shrink: 0;
+    }
+
+    table.data td[data-label="Acciones"],
+    table.data td[data-label="Graficar"] {
+        justify-content: flex-start;
+    }
+    table.data td[data-label="Acciones"] .btn-row { justify-content: flex-end; width: 100%; }
+    table.data td .btn-row { flex-wrap: wrap; justify-content: flex-end; }
+}
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+/* Oculta el app-shell hasta que haya sesion, y la pantalla de login
+   una vez que ya la hay (ver app.js: agrega/quita body.autenticado). */
+.app-shell { display: none; }
+body.autenticado .app-shell { display: flex; }
+body.autenticado .login-screen { display: none; }
+
+.login-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, var(--bg) 0%, var(--amber-soft) 100%);
+    padding: 20px;
+    /* En pantallas cortas (celular en horizontal, o con el teclado
+       virtual abierto) el contenido puede ser mas alto que el viewport
+       visible. Antes esto se recortaba sin poder hacer scroll (la unica
+       forma de "salir" del login era rotar el telefono). Con overflow-y
+       auto, si no cabe, aparece scroll DENTRO de la pantalla de login en
+       vez de cortar el boton "Iniciar sesión" fuera de vista. */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Respeta el notch/isla dinamica y la barra de gestos en iOS/Android. */
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+
+.login-card {
+    width: 100%;
+    max-width: 360px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lift);
+    padding: 32px 28px;
+    text-align: center;
+    /* Evita que el card quede pegado al borde superior/inferior cuando
+       hace falta scroll (ver overflow-y en .login-screen). */
+    margin: auto;
+}
+
+@media (max-width: 420px) {
+    .login-card { padding: 26px 20px; }
+    .login-logo { width: 96px; }
+}
+
+.login-logo { width: 120px; height: auto; margin-bottom: 16px; }
+.login-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text); }
+.login-sub { font-size: 12.5px; color: var(--text-muted); margin: 6px 0 22px; line-height: 1.5; }
+.login-card .field { text-align: left; }
+
+.login-error {
+    background: #fdecea;
+    border: 1px solid #f4c3bd;
+    color: #b3261e;
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-size: 12.5px;
+    margin-bottom: 14px;
+    text-align: left;
+}
+
+/* =========================================================
+   USUARIO ACTUAL (sidebar)
+   ========================================================= */
+
+.sidebar-user {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 6px;
+}
+.sidebar-user-email {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+    overflow-wrap: break-word;
+}
+
+/* =========================================================
+   BOTON FLOTANTE DE WHATSAPP (soporte tecnico)
+   ========================================================= */
+.whatsapp-fab {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #25D366;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,.28);
+    z-index: 1000;
+    text-decoration: none;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.whatsapp-fab:hover,
+.whatsapp-fab:focus-visible {
+    transform: scale(1.06);
+    box-shadow: 0 6px 18px rgba(0,0,0,.34);
+}
+@media (max-width: 860px) {
+    .whatsapp-fab {
+        right: 14px;
+        width: 50px;
+        height: 50px;
+    }
+    /* Con sesion iniciada hay una barra de navegacion fija abajo (.mobile-tabbar):
+       se sube el boton para que no quede tapado por ella. */
+    body.autenticado .whatsapp-fab {
+        bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+    }
+    body:not(.autenticado) .whatsapp-fab {
+        bottom: 14px;
+    }
+}
+
+/* =========================================================
+   LOGIN: pestañas Iniciar sesión / Registrarse
+   ========================================================= */
+
+.login-card { max-width: 400px; }
+
+.login-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin: 16px 0 6px;
+}
+.login-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 9px 10px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    min-height: 40px;
+}
+.login-tab.active { background: var(--surface); color: var(--amber); box-shadow: 0 1px 3px rgba(20,20,25,0.12); }
+
+.login-card form { text-align: left; }
+.login-card .login-sub { text-align: center; margin-top: 14px; }
+
+.sidebar-user-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    overflow-wrap: break-word;
+}
+.sidebar-user-name:empty { display: none; }
+.sidebar-user-name + .sidebar-user-email { font-weight: 500; color: var(--text-muted); }
+
+/* =========================================================
+   VISTA DE GRAFICO (solo grafico interactivo + datos)
+   ========================================================= */
+
+.gr-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+.gr-check { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); cursor: pointer; }
+.gr-check input { width: 16px; height: 16px; accent-color: var(--amber); }
+
+.gr-canvas-box { height: 460px; }
+@media (max-width: 720px) { .gr-canvas-box { height: 340px; } }
+
+.gr-resumen { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+.gr-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: var(--surface-2);
+    font-size: 12.5px;
+}
+.gr-chip .gr-dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+.gr-chip .gr-chip-datos { font-family: var(--font-mono); color: var(--text-muted); font-size: 11.5px; }
+
+/* Tabla de datos del grafico: NO usa table.data, porque en movil esa clase
+   convierte cada fila en una tarjeta y con 23 temperaturas seria eterno. */
+.gr-tabla-wrap { overflow: auto; max-height: 460px; border: 1px solid var(--border); border-radius: var(--radius); }
+table.gr-datos { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+table.gr-datos th {
+    position: sticky; top: 0; z-index: 1;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    text-align: right;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+}
+table.gr-datos th:first-child, table.gr-datos td:first-child { text-align: left; position: sticky; left: 0; background: var(--surface-2); z-index: 2; }
+table.gr-datos td { padding: 9px 14px; text-align: right; border-bottom: 1px solid var(--border-soft); font-family: var(--font-mono); white-space: nowrap; }
+table.gr-datos tbody tr { cursor: default; }
+table.gr-datos tbody tr:hover td { background: var(--amber-soft); }
+table.gr-datos tbody tr:hover td:first-child { background: var(--amber-soft); }
+table.gr-datos tr.gr-conocido td { font-weight: 600; }
+table.gr-datos tr.gr-conocido td:first-child::after { content: ' ●'; color: var(--amber); font-size: 9px; }
+table.gr-datos tr:last-child td { border-bottom: none; }
+.gr-leyenda-nota { font-size: 11.5px; color: var(--text-faint); margin-top: 8px; }
+
+/* Boton "Usuarios" en la esquina de la barra superior (solo administradores).
+   Visible en PC y en movil; en pantallas muy angostas se compacta. */
+.topbar-admin-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--amber-soft);
+    border: 1px solid var(--amber);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    color: var(--amber);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.topbar-admin-btn.hidden { display: none; }
+.topbar-admin-btn:hover { background: var(--amber); color: var(--on-accent); }
+.topbar-admin-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+@media (max-width: 420px) {
+    .topbar-admin-btn { padding: 8px 10px; }
+    .topbar-admin-btn span { display: none; }
+}
+
+/* =========================================================
+   CONTRASEÑA: "¿Olvidaste tu contraseña?" y cambio de clave
+   ========================================================= */
+
+.login-forgot-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    margin: -4px 0 14px;
+}
+.login-forgot-row.center { align-items: center; margin: 14px 0 0; }
+.modal-box .login-forgot-row { align-items: flex-start; margin: 14px 0 0; }
+
+.link-btn {
+    background: none;
+    border: none;
+    padding: 4px 0;
+    min-height: 32px;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--amber);
+    cursor: pointer;
+    text-decoration: none;
+}
+.link-btn:hover { text-decoration: underline; }
+.link-btn:disabled { color: var(--text-faint); cursor: default; text-decoration: none; }
+.link-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: 3px; }
+
+.codigo-input {
+    font-family: var(--font-mono);
+    font-size: 22px !important;
+    letter-spacing: 0.35em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.login-ok {
+    background: rgba(47, 158, 88, 0.1);
+    border: 1px solid rgba(47, 158, 88, 0.35);
+    color: #1f7a42;
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-size: 12.5px;
+    margin-bottom: 14px;
+    text-align: left;
+}
+
+.modal-box.modal-sm { max-width: 440px; }
+
+/* En el login se oculta la barra de pestañas mientras se recupera la clave. */
+.login-card.modo-recuperar .login-tabs { display: none; }
+
+/* Boton "Cambiar contraseña" en la barra superior: solo en movil, porque
+   ahi el menu lateral (donde esta el boton en PC) no se abre. */
+.topbar-cuenta-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+.topbar-cuenta-btn:hover { color: var(--amber); border-color: var(--amber); }
+.topbar-cuenta-btn svg { width: 18px; height: 18px; }
+@media (min-width: 861px) {
+    .topbar-cuenta-btn { display: none; }
+}

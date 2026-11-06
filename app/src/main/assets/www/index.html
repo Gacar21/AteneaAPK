@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
+<title>Atenea — Índice de Viscosidad y Curvas Temperatura</title>
+<link rel="stylesheet" href="assets/css/style.css?v=5">
+<meta name="theme-color" content="#e31d25">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Atenea">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<script src="assets/js/vendor/chart.umd.min.js"></script>
+<link rel="stylesheet" href="assets/css/local.css">
+<script src="assets/js/vendor/jszip.min.js"></script>
+<script src="assets/js/vendor/pdf-lib.min.js"></script>
+</head>
+<body class="autenticado modo-local">
+
+<!-- ============ BOTON FLOTANTE DE WHATSAPP (soporte tecnico) ============ -->
+<a class="whatsapp-fab" id="whatsapp-fab" href="https://wa.me/3042538883" target="_blank" rel="noopener" aria-label="Soporte técnico por WhatsApp">
+    <svg viewBox="0 0 32 32" width="28" height="28" fill="currentColor" aria-hidden="true">
+        <path d="M16.001 3C9.373 3 4 8.373 4 15c0 2.362.687 4.564 1.872 6.417L4 29l7.77-1.83A11.94 11.94 0 0 0 16.001 27C22.628 27 28 21.627 28 15S22.628 3 16.001 3Zm0 21.75c-1.977 0-3.822-.55-5.397-1.505l-.387-.23-4.61 1.086 1.128-4.49-.253-.4A9.71 9.71 0 0 1 5.25 15c0-5.937 4.813-10.75 10.751-10.75S26.75 9.063 26.75 15 21.938 24.75 16.001 24.75Zm5.929-8.045c-.325-.163-1.923-.949-2.222-1.058-.298-.109-.515-.163-.732.163-.216.326-.84 1.058-1.03 1.276-.19.217-.379.244-.704.081-.325-.163-1.373-.505-2.615-1.611-.967-.862-1.62-1.927-1.81-2.253-.19-.326-.02-.502.143-.664.146-.146.325-.379.488-.569.163-.19.216-.326.325-.543.108-.217.054-.407-.027-.57-.081-.163-.732-1.762-1.003-2.414-.264-.634-.532-.548-.732-.558l-.623-.011c-.217 0-.57.081-.868.407-.298.326-1.138 1.112-1.138 2.712 0 1.6 1.165 3.146 1.327 3.363.163.217 2.293 3.502 5.556 4.912.776.335 1.382.535 1.854.685.779.248 1.488.213 2.049.129.625-.093 1.923-.786 2.194-1.545.271-.76.271-1.41.19-1.546-.081-.135-.298-.217-.624-.38Z"/>
+    </svg>
+</a>
+
+<!-- ============ LOGIN ============ -->
+<div class="login-screen" id="login-screen">
+    <div class="login-card">
+        <img class="login-logo" src="assets/img/logo-lcm.png" alt="Lubricación de Clase Mundial">
+        <div class="login-title">Atenea</div>
+
+        <div class="login-tabs" role="tablist">
+            <button type="button" class="login-tab active" id="login-tab-entrar" role="tab" data-login-tab="entrar">Iniciar sesión</button>
+            <button type="button" class="login-tab" id="login-tab-registro" role="tab" data-login-tab="registro">Registrarse</button>
+        </div>
+
+        <!-- ---- Iniciar sesion ---- -->
+        <form id="login-form">
+            <div class="login-sub">Entra con tu correo electrónico y tu contraseña</div>
+
+            <div class="field">
+                <label>Correo electrónico</label>
+                <input type="text" id="login-email" placeholder="tucorreo@gmail.com" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+            </div>
+            <div class="field">
+                <label>Contraseña</label>
+                <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required>
+            </div>
+            <div class="login-forgot-row">
+                <button type="button" class="link-btn" id="login-olvide-btn">¿Olvidaste tu contraseña?</button>
+            </div>
+
+            <div id="login-error" class="login-error hidden"></div>
+
+            <button type="submit" class="btn btn-primary" id="login-submit-btn" style="width:100%; justify-content:center;">
+                Iniciar sesión
+            </button>
+        </form>
+
+        <!-- ---- Registro ---- -->
+        <form id="register-form" class="hidden">
+            <div class="login-sub">Crea tu cuenta. Tus cálculos y curvas quedan guardados solo en tu usuario.</div>
+
+            <div class="field">
+                <label>Nombre completo</label>
+                <input type="text" id="register-nombre" placeholder="Ej: Juan Pérez" autocomplete="name" maxlength="150" required>
+            </div>
+            <div class="field">
+                <label>Correo electrónico</label>
+                <input type="email" id="register-email" placeholder="tucorreo@gmail.com" autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="150" required>
+                <div class="field-hint">Puedes usar Gmail, Hotmail, Outlook o el correo que prefieras. Te enviaremos una confirmación.</div>
+            </div>
+            <div class="field">
+                <label>Contraseña</label>
+                <input type="password" id="register-password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8" maxlength="72" required>
+            </div>
+            <div class="field">
+                <label>Confirmar contraseña</label>
+                <input type="password" id="register-password2" placeholder="Repite la contraseña" autocomplete="new-password" minlength="8" maxlength="72" required>
+            </div>
+
+            <div id="register-error" class="login-error hidden"></div>
+
+            <button type="submit" class="btn btn-primary" id="register-submit-btn" style="width:100%; justify-content:center;">
+                Crear cuenta
+            </button>
+        </form>
+
+        <!-- ---- ¿Olvidaste tu contraseña? Paso 1: correo ---- -->
+        <form id="forgot-form" class="hidden" novalidate>
+            <div class="login-sub">Escribe el correo de tu cuenta. Te enviaremos un <strong>código</strong> y un <strong>enlace</strong> para crear una contraseña nueva.</div>
+
+            <div class="field">
+                <label>Correo electrónico</label>
+                <input type="email" id="forgot-email" placeholder="tucorreo@gmail.com" autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="150" required>
+            </div>
+
+            <div id="forgot-error" class="login-error hidden"></div>
+
+            <button type="submit" class="btn btn-primary" id="forgot-submit-btn" style="width:100%; justify-content:center;">
+                Enviar código
+            </button>
+            <div class="login-forgot-row center">
+                <button type="button" class="link-btn" data-volver-login>← Volver a iniciar sesión</button>
+            </div>
+        </form>
+
+        <!-- ---- ¿Olvidaste tu contraseña? Paso 2: codigo (o enlace) + clave nueva ---- -->
+        <form id="reset-form" class="hidden" novalidate>
+            <div class="login-sub" id="reset-sub"></div>
+
+            <div class="field" id="reset-codigo-field">
+                <label>Código de verificación</label>
+                <input type="text" id="reset-codigo" class="codigo-input" placeholder="000000" inputmode="numeric" autocomplete="one-time-code" maxlength="7" pattern="[0-9 ]*">
+                <div class="field-hint">Revisa también la carpeta de spam o correo no deseado.</div>
+            </div>
+            <div class="field">
+                <label>Contraseña nueva</label>
+                <input type="password" id="reset-password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8" maxlength="72">
+            </div>
+            <div class="field">
+                <label>Confirmar contraseña nueva</label>
+                <input type="password" id="reset-password2" placeholder="Repite la contraseña" autocomplete="new-password" minlength="8" maxlength="72">
+            </div>
+
+            <div id="reset-error" class="login-error hidden"></div>
+
+            <button type="submit" class="btn btn-primary" id="reset-submit-btn" style="width:100%; justify-content:center;">
+                Cambiar contraseña
+            </button>
+            <div class="login-forgot-row center">
+                <button type="button" class="link-btn" id="reset-reenviar-btn">¿No te llegó? Enviar otro código</button>
+                <button type="button" class="link-btn" data-volver-login>← Volver a iniciar sesión</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="app-shell">
+
+    <!-- ============ TOPBAR (movil y PC) ============ -->
+    <header class="topbar">
+        <img class="topbar-mark" src="assets/img/logo-lcm.png" alt="Lubricación de Clase Mundial">
+        <button class="topbar-back-btn hidden" id="topbar-back-btn" aria-label="Volver al menú principal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18 l-6-6 6-6"/></svg>
+            Volver al menú
+        </button>
+        <div class="topbar-title" id="mobile-view-title">Panel general</div>
+        <button class="topbar-admin-btn hidden" id="topbar-admin-btn" aria-label="Ver usuarios inscritos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 5.2a3.3 3.3 0 0 1 0 5.6M18 14.4c2 .7 3.5 2.6 3.5 5.6"/></svg>
+            <span>Usuarios</span>
+        </button>
+        <button class="topbar-cuenta-btn" id="topbar-password-btn" aria-label="Cambiar contraseña" title="Cambiar contraseña">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 L20 3 M16 7 l3 3 M18.5 4.5 l2 2"/></svg>
+        </button>
+        <button class="menu-toggle-btn" id="menu-toggle-open" aria-label="Abrir menú">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            <span>Menú</span>
+        </button>
+    </header>
+
+    <!-- ============ SIDEBAR (desktop) / DRAWER (movil) ============ -->
+    <div class="sidebar-scrim" id="sidebar-scrim"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <img class="brand-logo" src="assets/img/logo-lcm.png" alt="Lubricación de Clase Mundial S.A.S">
+            <button class="mobile-menu-close" id="mobile-menu-close" aria-label="Cerrar menú">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+        </div>
+        <div class="brand-sub">Atenea · ASTM D2270 / D341</div>
+
+        <nav class="nav">
+            <div class="nav-label">Panel</div>
+            <div class="nav-item active" data-view="dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+                Panel general
+            </div>
+
+            <div class="nav-label">Calculadoras</div>
+            <div class="nav-item" data-view="indice">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17 L9 9 L14 14 L21 5"/><path d="M21 5 h-5 M21 5 v5"/></svg>
+                Viscosidad 40°C, 100°C e IV
+            </div>
+            <div class="nav-item" data-view="curvas">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3 v18 h18"/><path d="M6 16 C 9 8, 13 8, 21 6"/></svg>
+                Curvas Viscosidad vs Temperatura
+            </div>
+
+            <div class="nav-label">Catálogo</div>
+            <div class="nav-item" data-view="catalogo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21 l-4.3-4.3"/></svg>
+                Buscar lubricantes
+            </div>
+
+            <div class="nav-label">Registros</div>
+            <div class="nav-item" data-view="historial">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7 v5 l3 3"/></svg>
+                Historial y exportar
+            </div>
+        </nav>
+
+        <div class="sidebar-user" id="sidebar-user">
+            <div class="sidebar-user-name" id="sidebar-user-name"></div>
+            <div class="sidebar-user-email" id="sidebar-user-email">—</div>
+            <div class="btn-row" style="margin-top:8px;">
+                <button class="btn btn-ghost btn-sm hidden" id="sidebar-admin-btn">Usuarios</button>
+                <button class="btn btn-ghost btn-sm" id="sidebar-password-btn">Cambiar contraseña</button>
+                <button class="btn btn-ghost btn-sm" id="sidebar-logout-btn">Cerrar sesión</button>
+            </div>
+        </div>
+
+        <div class="sidebar-foot">
+            Motor de cálculo replicado de<br>
+            <strong style="color:var(--text-muted)">Viscosidad_Pedro_Albarracín.xlsm</strong> y<br>
+            <strong style="color:var(--text-muted)">Generación_Curvas_Viscosidad_Temperatura.xlsx</strong>
+        </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <main class="main">
+
+        <!-- ================= DASHBOARD ================= -->
+        <section class="view active" id="view-dashboard">
+            <div class="hero hero-menu">
+                <img class="hero-logo" src="assets/img/logo-lcm.png" alt="Lubricación de Clase Mundial S.A.S">
+                <span class="eyebrow">Laboratorio de viscosidad</span>
+                <h1>¿Qué necesitas hacer hoy?</h1>
+                <p>Elige un área para entrar. Índice de Viscosidad (ASTM D2270) y curvas Viscosidad–Temperatura (ASTM D341), con historial en base de datos y exportación a Excel y PDF.</p>
+
+                <div class="menu-grid">
+                    <button class="menu-card" data-goto="indice">
+                        <span class="menu-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17 L9 9 L14 14 L21 5"/><path d="M21 5 h-5 M21 5 v5"/></svg>
+                        </span>
+                        <span class="menu-card-title">Viscosidad 40°C, 100°C e IV</span>
+                        <span class="menu-card-desc">Calcula el IV según ASTM D2270</span>
+                    </button>
+                    <button class="menu-card" data-goto="curvas">
+                        <span class="menu-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3 v18 h18"/><path d="M6 16 C 9 8, 13 8, 21 6"/></svg>
+                        </span>
+                        <span class="menu-card-title">Curvas Viscosidad vs Temperatura</span>
+                        <span class="menu-card-desc">Genera curvas según ASTM D341</span>
+                    </button>
+                    <button class="menu-card" data-goto="catalogo">
+                        <span class="menu-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21 l-4.3-4.3"/></svg>
+                        </span>
+                        <span class="menu-card-title">Buscar lubricantes</span>
+                        <span class="menu-card-desc">Consulta el catálogo técnico</span>
+                    </button>
+                    <button class="menu-card" data-goto="historial">
+                        <span class="menu-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7 v5 l3 3"/></svg>
+                        </span>
+                        <span class="menu-card-title">Historial y exportar</span>
+                        <span class="menu-card-desc">Revisa y exporta registros</span>
+                    </button>
+                </div>
+
+                <div class="stat-row">
+                    <div><div class="stat-num" id="stat-vi">—</div><div class="stat-label">Cálculos de IV</div></div>
+                    <div><div class="stat-num" id="stat-aceites">—</div><div class="stat-label">Aceites guardados</div></div>
+                    <div><div class="stat-num">311</div><div class="stat-label">Puntos tabla ASTM</div></div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title">Últimos cálculos de IV</div>
+                    <div class="card-sub">Los 5 registros más recientes</div>
+                    <div id="dash-vi-list"><div class="empty-state"><p>Cargando…</p></div></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Aceites guardados</div>
+                    <div class="card-sub">Curvas generadas recientemente</div>
+                    <div id="dash-aceites-list"><div class="empty-state"><p>Cargando…</p></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= INDICE DE VISCOSIDAD ================= -->
+        <section class="view" id="view-indice">
+            <div class="view-header">
+                <div>
+                    <span class="eyebrow">Módulo 1 · ASTM D2270</span>
+                    <h2 class="view-title">Viscosidad 40°C, 100°C e IV</h2>
+                    <div class="view-desc">Interpolación sobre la tabla oficial ASTM (311 puntos) igual que el archivo original. Elige qué quieres resolver.</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="tab-select" id="iv-tabs">
+                    <button class="active" data-modo="directo">Calcular IV</button>
+                    <button data-modo="hallar_U">Hallar Visc. 40°C</button>
+                    <button data-modo="hallar_Y">Hallar Visc. 100°C</button>
+                </div>
+
+                <div class="field">
+                    <label>Nombre de la muestra (opcional)</label>
+                    <input type="text" id="iv-nombre" placeholder="Ej: Aceite SAE 20W50 — lote 04">
+                </div>
+
+                <!-- modo: directo -->
+                <div id="iv-form-directo" class="iv-form">
+                    <div class="grid-2">
+                        <div class="field">
+                            <label>Viscosidad a 100°C (Y)</label>
+                            <div class="field-suffix-wrap">
+                                <input type="number" step="any" id="iv-directo-y" placeholder="8.00">
+                                <span class="field-suffix">cSt</span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Viscosidad a 40°C (U)</label>
+                            <div class="field-suffix-wrap">
+                                <input type="number" step="any" id="iv-directo-u" placeholder="23.00">
+                                <span class="field-suffix">cSt</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- modo: hallar U -->
+                <div id="iv-form-hallar_U" class="iv-form hidden">
+                    <div class="grid-2">
+                        <div class="field">
+                            <label>Viscosidad a 100°C (Y) conocida</label>
+                            <div class="field-suffix-wrap">
+                                <input type="number" step="any" id="iv-hu-y" placeholder="8.00">
+                                <span class="field-suffix">cSt</span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Índice de Viscosidad objetivo</label>
+                            <input type="number" step="any" id="iv-hu-vi" placeholder="362">
+                        </div>
+                    </div>
+                    <div class="field-hint">Se calcula por bisección numérica — reemplaza la macro Goal Seek "HallarU" del Excel.</div>
+                </div>
+
+                <!-- modo: hallar Y -->
+                <div id="iv-form-hallar_Y" class="iv-form hidden">
+                    <div class="grid-2">
+                        <div class="field">
+                            <label>Viscosidad a 40°C (U) conocida</label>
+                            <div class="field-suffix-wrap">
+                                <input type="number" step="any" id="iv-hy-u" placeholder="23.00">
+                                <span class="field-suffix">cSt</span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Índice de Viscosidad objetivo</label>
+                            <input type="number" step="any" id="iv-hy-vi" placeholder="362">
+                        </div>
+                    </div>
+                    <div class="field-hint">Se calcula por bisección numérica — reemplaza la macro Goal Seek "BuscarY" del Excel.</div>
+                </div>
+
+                <div class="field">
+                    <label>Notas (opcional)</label>
+                    <textarea id="iv-notas" placeholder="Observaciones del ensayo…"></textarea>
+                </div>
+
+                <div class="btn-row action-bar-mobile">
+                    <button class="btn btn-primary" id="iv-calcular-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+                        Calcular
+                    </button>
+                    <button class="btn btn-ghost" id="iv-limpiar-btn">Limpiar</button>
+                </div>
+
+                <div id="iv-resultado-wrap" class="hidden" style="margin-top:20px;">
+                    <div class="resultado-box">
+                        <div>
+                            <div class="resultado-label" id="iv-res-label">Índice de Viscosidad</div>
+                            <div class="resultado-valor" id="iv-res-valor">—</div>
+                        </div>
+                        <div class="resultado-meta">
+                            <div><div class="m-label">Valor L</div><div class="m-valor" id="iv-res-l">—</div></div>
+                            <div><div class="m-label">Valor H</div><div class="m-valor" id="iv-res-h">—</div></div>
+                            <div><div class="m-label">Rama</div><div class="m-valor"><span class="badge badge-amber" id="iv-res-rama">—</span></div></div>
+                        </div>
+                    </div>
+                    <div class="btn-row" style="margin-top:14px;">
+                        <button class="btn btn-teal btn-sm" id="iv-guardar-btn">Guardar en historial</button>
+                        <button class="btn btn-primary btn-sm" id="iv-guardar-grafica-btn">Guardar aceite para gráfica</button>
+                        <span id="iv-guardado-ok" class="hidden" style="color:var(--success); font-size:12.5px; align-self:center;">✓ Guardado correctamente</span>
+                        <span id="iv-guardado-grafica-ok" class="hidden" style="color:var(--success); font-size:12.5px; align-self:center;">✓ Guardado en Curvas → Aceites guardados</span>
+                    </div>
+                    <div id="iv-guardar-producto-wrap" class="hidden" style="margin-top:12px;">
+                        <div class="card" style="padding:14px 16px; background:var(--amber-soft); border-color:var(--amber);">
+                            <div style="font-size:12.5px; color:var(--text-muted); margin-bottom:10px;">
+                                A <strong id="iv-guardar-producto-nombre">este producto</strong> del catálogo le faltaba este dato. Puedes completarlo con el valor recién calculado.
+                            </div>
+                            <button class="btn btn-primary btn-sm" id="iv-guardar-producto-btn">Guardar este valor en el producto del catálogo</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= CURVAS ================= -->
+        <section class="view" id="view-curvas">
+            <div class="view-header">
+                <div>
+                    <span class="eyebrow">Módulo 2 · ASTM D341</span>
+                    <h2 class="view-title">Curvas Viscosidad vs Temperatura</h2>
+                    <div class="view-desc">Ecuación de Walther: a partir de la viscosidad a 40°C y 100°C, genera la curva completa de 10°C a 230°C.</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title">Nuevo aceite</div>
+                    <div class="card-sub">Ingresa los 2 puntos conocidos de viscosidad. Al generar el gráfico, el aceite queda guardado en tu cuenta.</div>
+
+                    <div class="field">
+                        <label>Nombre del aceite</label>
+                        <input type="text" id="cv-nombre" placeholder="Ej: Mobil Gear Oil 75W90">
+                    </div>
+                    <div class="grid-2">
+                        <div class="field">
+                            <label>Viscosidad a 40°C</label>
+                            <div class="field-suffix-wrap">
+                                <input type="number" step="any" id="cv-v40" placeholder="115">
+                                <span class="field-suffix">cSt</span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Viscosidad a 100°C</label>
+                            <div class="field-suffix-wrap">
+                                <input type="number" step="any" id="cv-v100" placeholder="15.7">
+                                <span class="field-suffix">cSt</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Notas (opcional)</label>
+                        <textarea id="cv-notas" placeholder="Aplicación, fabricante, etc."></textarea>
+                    </div>
+                    <div class="btn-row action-bar-mobile">
+                        <button class="btn btn-primary" id="cv-generar-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M6 16c3-8 7-8 15-10"/></svg>
+                            Generar gráfico
+                        </button>
+                        <button class="btn btn-ghost" id="cv-limpiar-btn">Limpiar</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Buscar rango de temperatura</div>
+                    <div class="card-sub">¿En qué temperatura este aceite alcanza cierta viscosidad?</div>
+
+                    <div class="field">
+                        <label>Aceite guardado</label>
+                        <select id="bt-aceite-select"><option value="">Selecciona un aceite guardado…</option></select>
+                    </div>
+                    <div class="grid-2">
+                        <div class="field">
+                            <label>Viscosidad objetivo</label>
+                            <div class="field-suffix-wrap">
+                                <input type="number" step="any" id="bt-visc" placeholder="35">
+                                <span class="field-suffix">cSt</span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Tolerancia (±%)</label>
+                            <input type="number" step="any" id="bt-tol" value="5">
+                        </div>
+                    </div>
+                    <button class="btn btn-teal" id="bt-buscar-btn">Buscar rango</button>
+
+                    <div id="bt-resultado" class="hidden" style="margin-top:16px;">
+                        <div class="resultado-box" style="padding:16px 18px;">
+                            <div>
+                                <div class="resultado-label">Rango de temperatura</div>
+                                <div class="resultado-valor" style="font-size:22px;"><span id="bt-tmin">—</span> a <span id="bt-tmax">—</span> <small>°C</small></div>
+                            </div>
+                            <div class="resultado-meta">
+                                <div><div class="m-label">Banda visc.</div><div class="m-valor"><span id="bt-vinf">—</span> – <span id="bt-vsup">—</span> cSt</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="ex-card">
+                <div class="card-title">Valor exacto a una temperatura o viscosidad</div>
+                <div class="card-sub">Usa la curva de un aceite guardado para hallar su viscosidad a cualquier temperatura, o la temperatura a la que alcanza una viscosidad exacta.</div>
+
+                <div class="field">
+                    <label>Aceite guardado</label>
+                    <select id="ex-aceite-select"><option value="">Selecciona un aceite guardado…</option></select>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <div class="field">
+                            <label>Temperatura</label>
+                            <div class="field-suffix-wrap">
+                                <input type="number" step="any" id="ex-temp" placeholder="55">
+                                <span class="field-suffix">°C</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-teal" id="ex-visc-btn">Calcular viscosidad</button>
+                        <div id="ex-visc-resultado" class="hidden" style="margin-top:16px;">
+                            <div class="resultado-box" style="padding:16px 18px;">
+                                <div>
+                                    <div class="resultado-label">Viscosidad a <span id="ex-visc-t">—</span> °C</div>
+                                    <div class="resultado-valor" style="font-size:22px;"><span id="ex-visc-val">—</span> <small>cSt</small></div>
+                                </div>
+                                <div class="resultado-meta">
+                                    <div id="ex-visc-aviso" class="m-label"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="field">
+                            <label>Viscosidad</label>
+                            <div class="field-suffix-wrap">
+                                <input type="number" step="any" id="ex-visc" placeholder="35">
+                                <span class="field-suffix">cSt</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-teal" id="ex-temp-btn">Calcular temperatura</button>
+                        <div id="ex-temp-resultado" class="hidden" style="margin-top:16px;">
+                            <div class="resultado-box" style="padding:16px 18px;">
+                                <div>
+                                    <div class="resultado-label">Temperatura a <span id="ex-temp-v">—</span> cSt</div>
+                                    <div class="resultado-valor" style="font-size:22px;"><span id="ex-temp-val">—</span> <small>°C</small></div>
+                                </div>
+                                <div class="resultado-meta">
+                                    <div id="ex-temp-aviso" class="m-label"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="flex-between">
+                    <div>
+                        <div class="card-title">Aceites guardados</div>
+                        <div class="card-sub">Marca uno o varios y pulsa «Ver gráfico de seleccionados» para comparar sus curvas</div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary btn-sm" id="cv-graficar-seleccion">Ver gráfico de seleccionados</button>
+                        <button class="btn btn-ghost btn-sm" id="cv-exportar-comparativo">Exportar comparativo (Excel)</button>
+                    </div>
+                </div>
+                <div class="field" style="margin-top:14px; max-width:340px;">
+                    <label>Buscar aceite guardado</label>
+                    <input type="text" id="cv-aceites-filtro" placeholder="Filtra por nombre…">
+                </div>
+                <div id="cv-aceites-tabla"><div class="empty-state"><p>Aún no hay aceites guardados.</p></div></div>
+            </div>
+        </section>
+
+        <!-- ================= GRAFICO (solo grafico interactivo + datos) ================= -->
+        <section class="view" id="view-grafico">
+            <div class="view-header">
+                <div>
+                    <span class="eyebrow">Módulo 2 · ASTM D341</span>
+                    <h2 class="view-title" id="gr-titulo">Viscosidad vs Temperatura</h2>
+                    <div class="view-desc" id="gr-desc"></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-ghost" id="gr-volver">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                        Volver a curvas
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="gr-toolbar">
+                    <div class="btn-row">
+                        <button class="btn btn-ghost btn-sm" id="gr-zoom-in" title="Acercar">＋ Acercar</button>
+                        <button class="btn btn-ghost btn-sm" id="gr-zoom-out" title="Alejar">－ Alejar</button>
+                        <button class="btn btn-ghost btn-sm" id="gr-zoom-reset" title="Ver todo">Restablecer</button>
+                    </div>
+                    <label class="gr-check"><input type="checkbox" id="gr-log"> Escala logarítmica (Y)</label>
+                </div>
+                <div class="chart-wrap">
+                    <div class="chart-canvas-box gr-canvas-box"><canvas id="gr-chart"></canvas></div>
+                </div>
+                <div class="field-hint" style="margin-top:10px;">Pasa el cursor (o toca) sobre la curva para ver los valores · toca un nombre de la leyenda para ocultar o mostrar esa curva · rueda del ratón para acercar.</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Datos de la curva</div>
+                <div class="card-sub">Viscosidad cinemática (cSt) a cada temperatura</div>
+                <div id="gr-resumen" class="gr-resumen"></div>
+                <div id="gr-tabla"></div>
+            </div>
+        </section>
+
+        <!-- ================= HISTORIAL ================= -->
+        <section class="view" id="view-historial">
+            <div class="view-header">
+                <div>
+                    <span class="eyebrow">Registros guardados</span>
+                    <h2 class="view-title">Historial y exportación</h2>
+                    <div class="view-desc">Todos los cálculos quedan guardados en este teléfono. Expórtalos a Excel o PDF cuando los necesites.</div>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <div class="chip active" data-tipo-hist="vi">Índice de Viscosidad</div>
+                <div class="chip" data-tipo-hist="curvas">Curvas de aceites</div>
+            </div>
+
+            <div class="card" id="hist-vi-card">
+                <div class="flex-between">
+                    <div class="card-title mt-0">Cálculos de Índice de Viscosidad</div>
+                    <button class="btn btn-ghost btn-sm" id="hist-vi-export-all">Exportar todo (Excel)</button>
+                </div>
+                <div id="hist-vi-tabla" style="margin-top:14px;"><div class="empty-state"><p>Cargando…</p></div></div>
+            </div>
+
+            <div class="card hidden" id="hist-curvas-card">
+                <div class="card-title mt-0">Aceites y curvas guardadas</div>
+                <div id="hist-curvas-tabla" style="margin-top:14px;"><div class="empty-state"><p>Cargando…</p></div></div>
+            </div>
+        </section>
+
+        <!-- ================= CATALOGO ================= -->
+        <section class="view" id="view-catalogo">
+            <div class="view-header">
+                <div>
+                    <span class="eyebrow">Catálogo técnico</span>
+                    <h2 class="view-title">Buscar lubricantes</h2>
+                    <div class="view-desc">Filtra por categoría, marca, tipo de base o especificación técnica para encontrar el producto que necesitas, o una equivalencia entre marcas.</div>
+                </div>
+            </div>
+
+            <div class="filter-row" style="margin-bottom:14px;">
+                <div class="chip active" data-cat-tab="buscar">Buscar</div>
+                <div class="chip" data-cat-tab="registrados">Registrados <span id="cat-tab-registrados-count">0</span></div>
+            </div>
+
+            <div id="cat-panel-buscar">
+            <div class="card">
+                <div class="field">
+                    <label>Buscar por nombre</label>
+                    <input type="text" id="cat-texto" placeholder="Ej: HVI 46, Staroil…">
+                </div>
+
+                <div class="grid-2">
+                    <div class="field">
+                        <label>Categoría</label>
+                        <select id="cat-categoria"><option value="">Todas</option></select>
+                    </div>
+                    <div class="field">
+                        <label>Marca</label>
+                        <select id="cat-marca"><option value="">Todas</option></select>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="field">
+                        <label>ISO VG</label>
+                        <select id="cat-iso-vg"><option value="">Cualquiera</option></select>
+                    </div>
+                    <div class="field">
+                        <label>Grado SAE</label>
+                        <select id="cat-grado-sae"><option value="">Cualquiera</option></select>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="field">
+                        <label>Tipo de base</label>
+                        <select id="cat-tipo-base"><option value="">Cualquiera</option></select>
+                    </div>
+                    <div class="field">
+                        <label>Naturaleza</label>
+                        <select id="cat-naturaleza"><option value="">Cualquiera</option></select>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="field">
+                        <label>Tipo de espesante <span class="text-faint" style="font-weight:400;">(grasas)</span></label>
+                        <select id="cat-tipo-espesante"><option value="">Cualquiera</option></select>
+                    </div>
+                    <div class="field">
+                        <label>NLGI <span class="text-faint" style="font-weight:400;">(grasas)</span></label>
+                        <select id="cat-nlgi"><option value="">Cualquiera</option></select>
+                    </div>
+                </div>
+
+                <div class="field-hint" style="margin:4px 0 10px;">Rangos técnicos (opcional):</div>
+                <div class="grid-2">
+                    <div class="field">
+                        <label>Viscosidad a 40°C (cSt)</label>
+                        <div class="grid-2" style="gap:8px;">
+                            <input type="number" step="any" id="cat-visc40-min" placeholder="Mín">
+                            <input type="number" step="any" id="cat-visc40-max" placeholder="Máx">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Índice de Viscosidad (VI)</label>
+                        <div class="grid-2" style="gap:8px;">
+                            <input type="number" step="any" id="cat-vi-min" placeholder="Mín">
+                            <input type="number" step="any" id="cat-vi-max" placeholder="Máx">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-row action-bar-mobile">
+                    <button class="btn btn-primary" id="cat-buscar-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21 l-4.3-4.3"/></svg>
+                        Buscar
+                    </button>
+                    <button class="btn btn-ghost" id="cat-limpiar-btn">Limpiar filtros</button>
+                </div>
+            </div>
+
+            <div class="flex-between" style="margin:18px 0 10px;">
+                <div class="card-title mt-0" id="cat-resultados-titulo">Resultados</div>
+                <button class="btn btn-ghost btn-sm" id="cat-export-resultados">Exportar (Excel)</button>
+            </div>
+            <div id="cat-resultados"><div class="empty-state"><p>Usa los filtros y presiona Buscar.</p></div></div>
+            </div>
+
+            <div id="cat-panel-registrados" class="hidden">
+                <div class="flex-between" style="margin:4px 0 10px;">
+                    <div class="card-title mt-0">Productos registrados</div>
+                    <button class="btn btn-ghost btn-sm" id="cat-registrados-export-excel">Exportar (Excel)</button>
+                </div>
+                <div class="view-desc" style="margin-bottom:14px;">Productos que guardaste desde distintas búsquedas, para compararlos o exportarlos sin repetir el filtro.</div>
+                <div id="cat-registrados-resultados"><div class="empty-state"><p>Aún no has registrado ningún producto.</p></div></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============ BOTTOM NAV MOVIL ============ -->
+    <nav class="mobile-tabbar">
+        <div class="mobile-tab nav-item active" data-view="dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+            <span>Panel</span>
+        </div>
+        <div class="mobile-tab nav-item" data-view="indice">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17 L9 9 L14 14 L21 5"/><path d="M21 5 h-5 M21 5 v5"/></svg>
+            <span>Viscosidad</span>
+        </div>
+        <div class="mobile-tab nav-item" data-view="curvas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3 v18 h18"/><path d="M6 16 C 9 8, 13 8, 21 6"/></svg>
+            <span>Curvas</span>
+        </div>
+        <div class="mobile-tab nav-item" data-view="catalogo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21 l-4.3-4.3"/></svg>
+            <span>Catálogo</span>
+        </div>
+        <div class="mobile-tab nav-item" data-view="historial">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7 v5 l3 3"/></svg>
+            <span>Historial</span>
+        </div>
+    </nav>
+</div>
+
+<!-- ================= MODAL: FICHA DE PRODUCTO ================= -->
+<div class="modal-overlay hidden" id="cat-modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" id="cat-modal-close" aria-label="Cerrar">✕</button>
+        <div id="cat-modal-contenido"><div class="empty-state"><p>Cargando…</p></div></div>
+    </div>
+</div>
+
+<!-- ================= MODAL: GESTION DE USUARIOS (admin) ================= -->
+<div class="modal-overlay hidden" id="usuarios-modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" id="usuarios-modal-close" aria-label="Cerrar">✕</button>
+        <div class="card-title">Gestión de usuarios</div>
+        <div class="card-sub">Crea cuentas con cualquier correo electrónico (Gmail, Hotmail, Outlook, etc.)</div>
+
+        <form id="usuarios-form" style="margin-top:16px;">
+            <div class="grid-2">
+                <div class="field">
+                    <label>Correo</label>
+                    <input type="email" id="usuarios-email" placeholder="nombre@gmail.com" required>
+                </div>
+                <div class="field">
+                    <label>Contraseña temporal</label>
+                    <input type="password" id="usuarios-password" placeholder="Mínimo 8 caracteres" required>
+                </div>
+            </div>
+            <div class="field">
+                <label>Rol</label>
+                <select id="usuarios-rol">
+                    <option value="usuario">Usuario</option>
+                    <option value="admin">Administrador</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm" id="usuarios-crear-btn">Crear usuario</button>
+        </form>
+
+        <div style="margin-top:22px;">
+            <div class="flex-between" style="margin-bottom:8px;">
+                <div class="card-title" style="font-size:14px;">Usuarios existentes <span id="usuarios-total" style="color:var(--text-faint); font-weight:500;"></span></div>
+                <button class="btn btn-teal btn-sm" id="usuarios-exportar-btn">Exportar a Excel</button>
+            </div>
+            <div id="usuarios-lista"><div class="empty-state"><p>Cargando…</p></div></div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= MODAL: CAMBIAR CONTRASEÑA ================= -->
+<div class="modal-overlay hidden" id="password-modal-overlay">
+    <div class="modal-box modal-sm" role="dialog" aria-modal="true" aria-labelledby="password-modal-title">
+        <button class="modal-close" id="password-modal-close" aria-label="Cerrar">✕</button>
+        <div class="card-title" id="password-modal-title">Cambiar contraseña</div>
+        <div class="card-sub">Por seguridad se cerrará tu sesión en los demás equipos.</div>
+
+        <form id="password-form" style="margin-top:16px;" novalidate>
+            <input type="text" id="password-usuario" autocomplete="username" hidden>
+            <div class="field" id="password-actual-field">
+                <label>Contraseña actual</label>
+                <input type="password" id="password-actual" autocomplete="current-password" maxlength="72">
+            </div>
+            <div class="field hidden" id="password-codigo-field">
+                <label>Código que te llegó al correo</label>
+                <input type="text" id="password-codigo" class="codigo-input" placeholder="000000" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+                <div class="field-hint" id="password-codigo-hint"></div>
+            </div>
+            <div class="field">
+                <label>Contraseña nueva</label>
+                <input type="password" id="password-nueva" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8" maxlength="72">
+            </div>
+            <div class="field">
+                <label>Confirmar contraseña nueva</label>
+                <input type="password" id="password-nueva2" placeholder="Repite la contraseña" autocomplete="new-password" minlength="8" maxlength="72">
+            </div>
+
+            <div id="password-error" class="login-error hidden"></div>
+
+            <div class="btn-row">
+                <button type="submit" class="btn btn-primary btn-sm" id="password-submit-btn">Guardar contraseña</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="password-cancel-btn">Cancelar</button>
+            </div>
+            <div class="login-forgot-row">
+                <button type="button" class="link-btn" id="password-olvide-btn">¿No recuerdas tu contraseña actual?</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="toast-holder"></div>
+
+<script src="assets/js/astm_table.js?v=2"></script>
+<script src="assets/js/local/atenea-local.js"></script>
+<script src="assets/js/local/exportar.js"></script>
+<script src="assets/js/app.js?v=6"></script>
+<script src="assets/js/local/catalogo-editor.js"></script>
+</body>
+</html>
